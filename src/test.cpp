@@ -9,39 +9,73 @@ void setup(void)
 {
 	serial_init(9600);
 	
-	spi_init(8E6, SPI_MODE_0, SPI_MASTER, SPI_MSB);
-	spi_pin_setup(10, SPI_PIN_SS);
-	spi_pin_setup(11, SPI_PIN_MOSI);
-	spi_pin_setup(12, SPI_PIN_MISO);
-	spi_pin_setup(13, SPI_PIN_SCK);
-
-	//pinMode(pin, OUTPUT);
+	//pinMode(13, OUTPUT);
+	int rc = 0;
+	
+	rc = spi_init_pin(10, SPI_PIN_SS);
+	if (rc == 1) serial_write("1",1); else serial_write("0", 1);
+	rc = spi_init_pin(11, SPI_PIN_MOSI);
+	if (rc == 1) serial_write("1",1); else serial_write("0", 1);
+	rc = spi_init_pin(12, SPI_PIN_MISO);
+	if (rc == 1) serial_write("1",1); else serial_write("0", 1);
+	rc = spi_init_pin(13, SPI_PIN_SCK);
+	if (rc == 1) serial_write("1",1); else serial_write("0", 1);
+	
+	
+	serial_write(" ", 1);
+	rc = spi_init(F_CPU/2, SPI_MODE_0, SPI_MASTER, SPI_MSB);
+	if (rc & (1 << 0)) serial_write("1",1);
+	if (rc & (1 << 1)) serial_write("2",1);
+	if (rc & (1 << 2)) serial_write("3",1);
+	if (rc & (1 << 3)) serial_write("4",1);
+	if (rc & (1 << 4)) serial_write("5",1);
+	if (rc & (1 << 5)) serial_write("6",1);
+	if (rc & (1 << 6)) serial_write("7",1);
+	if (rc & (1 << 7)) serial_write("8",1);
+	
+	serial_write(" ", 1);
+	
+	if (SPCR & (1 << 0)) serial_write("1",1);
+	if (SPCR & (1 << 1)) serial_write("2",1);
+	if (SPCR & (1 << 2)) serial_write("3",1);
+	if (SPCR & (1 << 3)) serial_write("4",1);
+	if (SPCR & (1 << 4)) serial_write("5",1);
+	if (SPCR & (1 << 5)) serial_write("6",1);
+	if (SPCR & (1 << 6)) serial_write("7",1);
+	if (SPCR & (1 << 7)) serial_write("8",1);
+	
+	serial_write(" ", 1);
 }
 
 void loop(void)
 {
-	//digitalWrite(pin, HIGH);
 	delay(1000);
+
+	serial_write("<", 1);
 	
-	serial_write(" | ", 3);
+	spi_begin();
+	spi_select(13);
 	
-	//digitalWrite(pin, LOW);
-	//delay(1000);
-	
-	if (serial_peek() >= 0) {
-		char foo[64];
-		
-		int n = serial_read(foo, 64);
-		serial_write(foo, n);
-		
-		delay(1000);
-		serial_deinit();
-		delay(1000);
-		
-		serial_init(9600);
-		
-		serial_write("reinit", 7);
+	serial_write(":", 1);
+
+	int rc = spi_write(0xFF);
+	if (rc != 0xff) {
+		serial_write("rc ", 3);
 	}
 	
-	//serial_write("world\n", 7);
+	serial_write(":", 1);
+
+	rc = spi_read();
+	if (rc != 0xFF) {
+		serial_write("!FF ", 4);
+	}
+	
+	serial_write(":", 1);
+
+	spi_deselect(13);
+	spi_end();
+
+	
+	serial_write(">", 1);
+	
 }

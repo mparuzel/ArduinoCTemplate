@@ -25,34 +25,35 @@
 /* =============================== STRUCTURES ============================== */
 
 typedef enum {
-	SPI_MODE_0,
-	SPI_MODE_1,
-	SPI_MODE_2,
-	SPI_MODE_3
+    SPI_MODE_0,
+    SPI_MODE_1,
+    SPI_MODE_2,
+    SPI_MODE_3
 } spi_mode_t;
 
 typedef enum {
-	SPI_MASTER,
-	SPI_SLAVE
+    SPI_MASTER,
+    SPI_SLAVE
 } spi_control_t;
 
 typedef enum {
-	SPI_MSB,
-	SPI_LSB
+    SPI_MSB,
+    SPI_LSB
 } spi_bit_order_t;
 
 typedef enum {
-	SPI_PIN_MISO,
-	SPI_PIN_MOSI,
-	SPI_PIN_SCK,
-	SPI_PIN_SS
+    SPI_PIN_MISO,
+    SPI_PIN_MOSI,
+    SPI_PIN_SCK,
+    SPI_PIN_SS
 } spi_pin_usage_t;
 
 /* ==================== SERIAL PERIPHERAL INTERFACE API ==================== */
 
 int spi_init(uint32_t clock, spi_mode_t mode, spi_control_t ctl, spi_bit_order_t ord);
-int spi_deinit(void);
-int spi_pin_setup(uint8_t pin, spi_pin_usage_t usage);
+int spi_init_pin(uint8_t pin, spi_pin_usage_t usage);
+int spi_begin(void);
+int spi_end(void);
 int spi_select(uint8_t ss_pin);
 int spi_deselect(uint8_t ss_pin);
 int spi_read(void);

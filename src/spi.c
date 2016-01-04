@@ -27,6 +27,11 @@ typedef struct {
 } pins_t;
 
 typedef struct {
+    uint8_t spcr;
+    uint8_t spsr;
+} config_t;
+
+typedef struct {
     volatile uint8_t *spcr;
     volatile uint8_t *spdr;
     volatile uint8_t *spsr;
@@ -34,7 +39,8 @@ typedef struct {
 
 /* ================================ GLOBALS ================================ */
 
-static registers_t _regs = { &SPCR, &SPDR, &SPSR };
+static registers_t _regs = SPI_REGS_INIT;
+static config_t    _cfg  = { 0, };
 static pins_t      _pins = { 0xFF, };
 
 /* ========================== INTERRUPT HANDLERS =========================== */
@@ -83,52 +89,66 @@ int spi_init(uint32_t clock, spi_mode_t mode, spi_control_t ctl, spi_bit_order_t
                                [6]          = F_CPU / 128 };
     
     uint8_t i = 0;
+    uint32_t freq = 0;
     
     /* Determine the flags that closly represent the clock speed. */
-    while (i < 6 && clock >= F_DIV[i]) {
+    for (freq = F_CPU / 2; i < 6 && clock < freq; freq >>= 1) {
         ++i;
     }
 
-    /* Set SPCR and SPSR (_BV(SPE) is used as placeholder for SPI2X flag). */
-    *_regs.spsr = (F_FLGS[i] & _BV(SPE)) ? _BV(SPI2X) : 0;
-    *_regs.spcr = _BV(SPE) | F_FLGS[i] | MODE[mode] | CTL[ctl] | BITORD[ord];
+    /* Setup SPCR and SPSR (_BV(SPE) in F_FLGS is a placeholder for SPI2X). */
+    _cfg.spsr = (F_FLGS[i] & _BV(SPE)) ? _BV(SPI2X) : 0;
+    _cfg.spcr = _BV(SPE) | F_FLGS[i] | MODE[mode] | CTL[ctl] | BITORD[ord];
 
     return 0;
 }
 
-int spi_deinit(void)
-{
-    *_regs.spcr = 0;
-    *_regs.spsr = 0;    
-    _pins = (pins_t) { { 0xFF, } };
-    
-    return 0;
-}
-
-int spi_pin_setup(uint8_t pin, spi_pin_usage_t usage)
+int spi_init_pin(uint8_t pin, spi_pin_usage_t usage)
 {
     /* PIN mode set for SPI slave (XOR will swap if MSTR is set). */
-    const uint8_t PIN_MODE[] = { [SPI_PIN_MISO] = PIN_MODE_OUTPUT,
-                                 [SPI_PIN_MOSI] = PIN_MODE_INPUT,
-                                 [SPI_PIN_SCK]  = PIN_MODE_INPUT,
-                                 [SPI_PIN_SS]   = PIN_MODE_INPUT };
-    
-    /* Invert the pin mode if the control register is set to slave mode. */
-    const uint8_t is_mstr = (*_regs.spcr & _BV(MSTR)) >> MSTR;
-    const pin_mode_t mode = (pin_mode_t) ((is_mstr ^ PIN_MODE[usage]) & 0x01);
-    
-    /* Normalize SS pin to deselected state. */
-    if (usage == SPI_PIN_SS) {
-        spi_deselect(pin);
-    }
+    const uint8_t PIN_MODE[] = { [SPI_PIN_MISO] = PIN_MODE_INPUT,
+                                 [SPI_PIN_MOSI] = PIN_MODE_OUTPUT,
+                                 [SPI_PIN_SCK]  = PIN_MODE_OUTPUT,
+                                 [SPI_PIN_SS]   = PIN_MODE_OUTPUT };
     
     /* Set the pin mode and save it for later use. */
-    int rc = gpio_pin_mode(pin, mode);
-    if (!rc) {
-        _pins.map[usage] = pin;
+    int rc = gpio_pin_mode(pin, PIN_MODE[usage]);
+    if (rc) {
+        return rc;
+    }
+    
+    _pins.map[usage] = pin;
+    
+    /* Normalize SS and MISO to high. */
+    if (usage == SPI_PIN_SS || usage == SPI_PIN_MISO) {
+        rc = gpio_digital_write(pin, 1);
     }
     
     return rc;
+}
+
+int spi_begin(void)
+{    
+    /* Check that the pins were set up properly. */
+    if (_pins.map[0] == 0xFF || 
+        _pins.map[1] == 0xFF || 
+        _pins.map[2] == 0xFF || 
+        _pins.map[3] == 0xFF) {
+        return -1;
+    }
+    
+    *_regs.spcr = _cfg.spcr;
+    *_regs.spsr = _cfg.spsr;
+    
+    return 0;
+}
+
+int spi_end(void)
+{
+    *_regs.spcr = 0;
+    *_regs.spsr = 0;
+    
+    return 0;
 }
 
 int spi_select(uint8_t ss_pin)

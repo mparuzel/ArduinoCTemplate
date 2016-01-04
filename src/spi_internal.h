@@ -22,6 +22,21 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
+#if defined(SPCR)
+#   define SPI_REGS_INIT { &SPCR, &SPDR, &SPSR }
+#elif defined(SPCR0)
+#   define SPI_REGS_INIT { &SPCR0, &SPDR0, &SPSR0 }
+#endif
 
+#if !defined(SPE) && defined(SPE0)
+#	define SPR0 	SPR00
+#	define SPR1		SPR10
+#	define CPHA		CPHA0
+#	define CPOL		CPOL0
+#	define MSTR		MSTR0
+#	define DORD		DORD0
+#	define SPE		SPE0
+#	define SPIE		SPIE0
+#endif
 
 #endif
