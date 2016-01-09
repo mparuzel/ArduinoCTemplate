@@ -56,7 +56,6 @@ int spi_begin(void);
 int spi_end(void);
 int spi_select(uint8_t ss_pin);
 int spi_deselect(uint8_t ss_pin);
-int spi_read(void);
-int spi_write(uint8_t byte);
+int spi_exchange(uint8_t in);
 
 #endif

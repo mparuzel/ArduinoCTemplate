@@ -47,20 +47,6 @@ static pins_t      _pins = { 0xFF, };
 
 // ISR SPI_STC_vect
 
-/* ========================= LOCAL FUNCTIONALITY =========================== */
-
-static uint8_t spi_exchange(uint8_t in)
-{
-    (void) *_regs.spsr; /* Flush previous SPIF. */
-    
-    /* Send byte and wait for completion. */
-    *_regs.spdr = in;
-    loop_until_bit_is_set(*_regs.spsr, SPIF);
-    
-    /* By reading SPDR, the SPIF flag is cleared. */
-    return *_regs.spdr;
-}
-
 /* =========================== SPI FUNCTIONALITY =========================== */
 
 int spi_init(uint32_t clock, spi_mode_t mode, spi_control_t ctl, spi_bit_order_t ord)
@@ -105,40 +91,43 @@ int spi_init(uint32_t clock, spi_mode_t mode, spi_control_t ctl, spi_bit_order_t
 
 int spi_init_pin(uint8_t pin, spi_pin_usage_t usage)
 {
-    /* PIN mode set for SPI slave (XOR will swap if MSTR is set). */
-    const uint8_t PIN_MODE[] = { [SPI_PIN_MISO] = PIN_MODE_INPUT,
-                                 [SPI_PIN_MOSI] = PIN_MODE_OUTPUT,
-                                 [SPI_PIN_SCK]  = PIN_MODE_OUTPUT,
-                                 [SPI_PIN_SS]   = PIN_MODE_OUTPUT };
-    
-    /* Set the pin mode and save it for later use. */
-    int rc = gpio_pin_mode(pin, PIN_MODE[usage]);
-    if (rc) {
-        return rc;
-    }
-    
     _pins.map[usage] = pin;
     
-    /* Normalize SS and MISO to high. */
-    if (usage == SPI_PIN_SS || usage == SPI_PIN_MISO) {
-        rc = gpio_digital_write(pin, 1);
-    }
-    
-    return rc;
+    return 0;
 }
 
 int spi_begin(void)
 {    
     /* Check that the pins were set up properly. */
-    if (_pins.map[0] == 0xFF || 
-        _pins.map[1] == 0xFF || 
-        _pins.map[2] == 0xFF || 
-        _pins.map[3] == 0xFF) {
+    if (_pins.map[SPI_PIN_SS] == 0xFF || 
+        _pins.map[SPI_PIN_SCK] == 0xFF || 
+        _pins.map[SPI_PIN_MOSI] == 0xFF) {
         return -1;
     }
+
+    /* If the MSTR flag is set, this value will determine if the PIN_MODE is 
+     * flipped to an opposite value. */
+    const uint8_t is_mstr = (_cfg.spcr & _BV(MSTR)) >> MSTR;
     
+    /* PIN mode set for SPI slave (XOR will swap if MSTR is set). */
+    const uint8_t PIN_MODE[] = { [SPI_PIN_MISO] = PIN_MODE_OUTPUT,
+                                 [SPI_PIN_MOSI] = PIN_MODE_INPUT,
+                                 [SPI_PIN_SCK]  = PIN_MODE_INPUT,
+                                 [SPI_PIN_SS]   = PIN_MODE_INPUT };
+
+    /* If acting as master, set SS to HIGH to enable pull-up resistor. */
+    gpio_digital_write(SPI_PIN_SS, is_mstr);
+    
+    gpio_pin_mode(_pins.map[SPI_PIN_SS], is_mstr ^ PIN_MODE[SPI_PIN_SS]);
+    
+    /* Apply settings. */
     *_regs.spcr = _cfg.spcr;
     *_regs.spsr = _cfg.spsr;
+
+    /* Setting the pins here avoids accidentally clocking in a single bit in
+     * some cases. */
+    gpio_pin_mode(_pins.map[SPI_PIN_MOSI], is_mstr ^ PIN_MODE[SPI_PIN_MOSI]);
+    gpio_pin_mode(_pins.map[SPI_PIN_SCK], is_mstr ^ PIN_MODE[SPI_PIN_SCK]);
     
     return 0;
 }
@@ -163,12 +152,17 @@ int spi_deselect(uint8_t ss_pin)
     return gpio_digital_write(ss_pin, 1);
 }
 
-int spi_read(void)
+int spi_exchange(uint8_t in)
 {
-    return (int) spi_exchange(0xFF);
-}
-
-int spi_write(uint8_t byte)
-{
-    return (int) spi_exchange(byte);
+    /* Queue byte for transfer. */
+    *_regs.spdr = in;
+    
+    /* Apparently, this NOP introduces a small delay before loop is started 
+     * which allows the SPDR register to be read. Such a delay yields an extra
+     * 10% speed boost. Don't as why; I read it in the Arduino SPI code. */
+    asm volatile("nop");
+    loop_until_bit_is_set(*_regs.spsr, SPIF);
+    
+    /* By reading SPDR, the SPIF flag is cleared. */
+    return *_regs.spdr;
 }
