@@ -3,6 +3,15 @@ extern "C" {
 #include "serial.h"
 #include "spi.h"
 }
+	const char hex[] = "0123456789ABCDEF--";
+
+static void dump_hex(uint8_t d) 
+{
+	serial_write("0x", 2);
+	serial_write(&hex[(d&0xF0) >> 4], 1);
+	serial_write(&hex[d&0xF], 1);
+}
+
 
 
 void setup(void)
@@ -13,39 +22,14 @@ void setup(void)
 	int rc = 0;
 	
 	rc = spi_init_pin(10, SPI_PIN_SS);
-	if (rc == 1) serial_write("1",1); else serial_write("0", 1);
 	rc = spi_init_pin(11, SPI_PIN_MOSI);
-	if (rc == 1) serial_write("1",1); else serial_write("0", 1);
 	rc = spi_init_pin(12, SPI_PIN_MISO);
-	if (rc == 1) serial_write("1",1); else serial_write("0", 1);
 	rc = spi_init_pin(13, SPI_PIN_SCK);
-	if (rc == 1) serial_write("1",1); else serial_write("0", 1);
 	
-	
-	serial_write(" ", 1);
 	rc = spi_init(F_CPU/2, SPI_MODE_0, SPI_MASTER, SPI_MSB);
-	if (rc & (1 << 0)) serial_write("1",1);
-	if (rc & (1 << 1)) serial_write("2",1);
-	if (rc & (1 << 2)) serial_write("3",1);
-	if (rc & (1 << 3)) serial_write("4",1);
-	if (rc & (1 << 4)) serial_write("5",1);
-	if (rc & (1 << 5)) serial_write("6",1);
-	if (rc & (1 << 6)) serial_write("7",1);
-	if (rc & (1 << 7)) serial_write("8",1);
-	
-	serial_write(" ", 1);
-	
-	if (SPCR & (1 << 0)) serial_write("1",1);
-	if (SPCR & (1 << 1)) serial_write("2",1);
-	if (SPCR & (1 << 2)) serial_write("3",1);
-	if (SPCR & (1 << 3)) serial_write("4",1);
-	if (SPCR & (1 << 4)) serial_write("5",1);
-	if (SPCR & (1 << 5)) serial_write("6",1);
-	if (SPCR & (1 << 6)) serial_write("7",1);
-	if (SPCR & (1 << 7)) serial_write("8",1);
-	
-	serial_write(" ", 1);
+
 }
+
 
 void loop(void)
 {
@@ -53,29 +37,40 @@ void loop(void)
 
 	serial_write("<", 1);
 	
-	spi_begin();
-	spi_select(13);
-	
-	serial_write(":", 1);
+	int rc = spi_begin();
+	if (rc == -1)
+		serial_write("adf", 3);
 
-	int rc = spi_write(0xFF);
-	if (rc != 0xff) {
-		serial_write("rc ", 3);
+	serial_write(" SPCR:", 6);
+	dump_hex(SPCR);
+	serial_write(" SPSR:", 6);
+	dump_hex(SPSR);
+	serial_write(">\n", 2);	
+
+	
+	
+	
+
+	for (byte regAddr = 1; regAddr <= 100; regAddr++)
+	{
+		spi_select(10);
+		spi_exchange(0x3c & 0x7F);
+		uint8_t b = spi_exchange(0);		
+		spi_deselect(10);
+		
+		dump_hex(regAddr);
+		serial_write(" -> ", 4);
+		dump_hex(b);
+		serial_write("\n", 1);
+
+		delay(100);
 	}
 	
-	serial_write(":", 1);
-
-	rc = spi_read();
-	if (rc != 0xFF) {
-		serial_write("!FF ", 4);
-	}
 	
-	serial_write(":", 1);
-
-	spi_deselect(13);
 	spi_end();
-
 	
-	serial_write(">", 1);
 	
+	serial_write(">\n", 2);
+	delay(5000);
+	while (1) {};
 }

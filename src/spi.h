@@ -2,17 +2,17 @@
  * Author: Mark Paruzel <mark@markparuzel.com>
  * Date:  2015-12-31
  *
- * This file is free software; you can redistribute it and/or modify it under 
- * the terms of the GNU Lesser General Public License as published by the 
- * Free Software Foundation; either version 2.1 of the License, or (at your 
- * option) any later version.
+ * This file is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
  *
- * This file is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This file is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
  *
- * You should have received a copy of the GNU Lesser General Public License 
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this file; if not, see: <http://www.gnu.org/licenses/>.
  */
 
@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-/* =============================== STRUCTURES ============================== */
+/* =============================== STRUCTURES =============================== */
 
 typedef enum {
     SPI_MODE_0,
@@ -48,7 +48,7 @@ typedef enum {
     SPI_PIN_SS
 } spi_pin_usage_t;
 
-/* ==================== SERIAL PERIPHERAL INTERFACE API ==================== */
+/* ==================== SERIAL PERIPHERAL INTERFACE API ===================== */
 
 int spi_init(uint32_t clock, spi_mode_t mode, spi_control_t ctl, spi_bit_order_t ord);
 int spi_init_pin(uint8_t pin, spi_pin_usage_t usage);
