@@ -49,7 +49,7 @@ static pins_t      _pins = { 0xFF, };
 
 /* =========================== SPI FUNCTIONALITY ============================ */
 
-int spi_init(uint32_t clk, spi_mode_t m, spi_control_t ctl, spi_bit_order_t ord)
+int spi_init(uint32_t clk, spi_mode_t m, spi_control_t ctl, spi_sbit_t sb)
 {
     const uint8_t MODE[]   = { [SPI_MODE_0] = _BV(CPHA),
                                [SPI_MODE_1] = _BV(CPOL),
@@ -57,7 +57,7 @@ int spi_init(uint32_t clk, spi_mode_t m, spi_control_t ctl, spi_bit_order_t ord)
                                [SPI_MODE_3] = 0 };
     const uint8_t CTL[]    = { [SPI_MASTER] = _BV(MSTR),
                                [SPI_SLAVE]  = 0 };
-    const uint8_t BITORD[] = { [SPI_MSB]    = 0,
+    const uint8_t SIGBIT[] = { [SPI_MSB]    = 0,
                                [SPI_LSB]    = _BV(DORD) };
     const uint8_t F_FLGS[] = { [0] /* 2 */  = _BV(SPE), /* SPI2X placeholder. */
                                [1] /* 4 */  = 0,
@@ -84,7 +84,7 @@ int spi_init(uint32_t clk, spi_mode_t m, spi_control_t ctl, spi_bit_order_t ord)
 
     /* Setup SPCR and SPSR (_BV(SPE) in F_FLGS is a placeholder for SPI2X). */
     _cfg.spsr = (F_FLGS[i] & _BV(SPE)) ? _BV(SPI2X) : 0;
-    _cfg.spcr = _BV(SPE) | F_FLGS[i] | MODE[m] | CTL[ctl] | BITORD[ord];
+    _cfg.spcr = _BV(SPE) | F_FLGS[i] | MODE[m] | CTL[ctl] | SIGBIT[sb];
 
     return 0;
 }

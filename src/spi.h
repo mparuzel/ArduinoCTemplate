@@ -39,7 +39,7 @@ typedef enum {
 typedef enum {
     SPI_MSB,
     SPI_LSB
-} spi_bit_order_t;
+} spi_sbit_t;
 
 typedef enum {
     SPI_PIN_MISO,
@@ -50,7 +50,7 @@ typedef enum {
 
 /* ==================== SERIAL PERIPHERAL INTERFACE API ===================== */
 
-int spi_init(uint32_t clock, spi_mode_t mode, spi_control_t ctl, spi_bit_order_t ord);
+int spi_init(uint32_t clock, spi_mode_t mode, spi_control_t ctl, spi_sbit_t sb);
 int spi_init_pin(uint8_t pin, spi_pin_usage_t usage);
 int spi_begin(void);
 int spi_end(void);
