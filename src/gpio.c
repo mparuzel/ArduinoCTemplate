@@ -19,43 +19,42 @@
 #include "gpio.h"
 #include "gpio_internal.h"
 
+/* ================================= MACROS ================================= */
+
+#define LIKELY(x)   __builtin_expect(!!(x), 1)
+#define UNLIKELY(x) __builtin_expect(!!(x), 0)
+
+/* =========================== INTERRUPT HANDLERS ===========================
+
+ISR(INT0_vect) {
+    intFunc[EXTERNAL_INT_0]();
+}
+*/
+
+
+
+/* =========================== GPIO FUNCTIONALITY =========================== */
+
 /* TODO: remove dependency on this. */
 #include "Arduino.h"
 
-int gpio_pin_mode(uint8_t pin, pin_mode_t mode)
-{
-    uint8_t bit = digitalPinToBitMask(pin);
-    uint8_t port = digitalPinToPort(pin);
+/* From arduino_pins.h */
+#define digitalPinToInterrupt(p)  ((p) == 2 ? 0 : ((p) == 3 ? 1 : NOT_AN_INTERRUPT))
 
-    if (port == NOT_A_PIN) {
+
+int gpio_attach_irq(uint8_t pin, void (*func)(void), interrupt_mode_t mode)
+{
+    uint8_t intr = digitalPinToInterrupt(pin);
+    if (intr == NOT_AN_INTERRUPT) {
         return -1;
     }
 
-    pinMode(pin, mode);
-    return 0;
+    attachInterrupt(intr, func, (int) mode);
+    return (int) 0;
 }
 
-int gpio_digital_write(uint8_t pin, uint8_t val)
+int gpio_detach_irq(uint8_t pin)
 {
-    uint8_t bit = digitalPinToBitMask(pin);
-    uint8_t port = digitalPinToPort(pin);
-
-    if (port == NOT_A_PIN) {
-        return -1;
-    }
-
-    digitalWrite(pin, val);
+    detachInterrupt(pin);
     return 0;
-}
-
-int gpio_digital_read(uint8_t pin)
-{
-    uint8_t bit = digitalPinToBitMask(pin);
-    uint8_t port = digitalPinToPort(pin);
-
-    if (port == NOT_A_PIN) {
-        return -1;
-    }
-
-    return (int) digitalRead(pin);
 }

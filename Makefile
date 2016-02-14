@@ -65,7 +65,7 @@ CPP_OBJS	= $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(CPP_FILES))
 
 # Compiler flags.
 LDFLAGS		= -Wl,--gc-sections -Wl,-s -Wl,-static
-OPT_FLAGS	= -Os -g
+OPT_FLAGS	= -O2 -g
 CFLAGS		= $(OPT_FLAGS) -ffunction-sections -fdata-sections -mmcu=$(MCU) -DF_CPU=$(CPU_FREQ) -MMD -DUSB_VID=null -DUSB_PID=null -DARDUINO=10606 -I$(SRC_DIR) -I$(LIB_DIR)
 CPPFLAGS	= -fno-exceptions $(CFLAGS)
 
@@ -93,9 +93,9 @@ $(BUILD_DIR)/$(TARGET): $(BUILD_DIR)/$(TARGET).elf
 	$(SIZE) $@
 
 .PHONY: build
-build: 
+build:
 	mkdir -p build
-	
+
 .PHONY: upload
 upload: $(BUILD_DIR)/$(TARGET)
 	$(AVRDUDE) -C$(AVRETC_DIR)/avrdude.conf -v -v -p$(MCU) -c$(UPLOAD_PROTOCOL) -P$(SERIAL_PORT) -b$(UPLOAD_SPEED) -D -Uflash:w:$(BUILD_DIR)/$(TARGET):i

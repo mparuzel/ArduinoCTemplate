@@ -19,6 +19,8 @@
 #ifndef SPI_H
 #define SPI_H
 
+#include "gpio.h"
+
 #include <stdint.h>
 #include <stddef.h>
 
@@ -50,12 +52,12 @@ typedef enum {
 
 /* ==================== SERIAL PERIPHERAL INTERFACE API ===================== */
 
-int spi_init(uint32_t clock, spi_mode_t mode, spi_control_t ctl, spi_sbit_t sb);
-int spi_init_pin(uint8_t pin, spi_pin_usage_t usage);
-int spi_begin(void);
-int spi_end(void);
-int spi_select(uint8_t ss_pin);
-int spi_deselect(uint8_t ss_pin);
-int spi_exchange(uint8_t in);
+int  spi_init(uint32_t clock, spi_mode_t mode, spi_control_t ctl, spi_sbit_t sb);
+void spi_init_pin(pin_t pin, spi_pin_usage_t usage);
+int  spi_begin(void);
+void spi_end(void);
+void spi_select(pin_t ss_pin);
+void spi_deselect(pin_t ss_pin);
+int  spi_exchange(uint8_t in);
 
 #endif

@@ -23,7 +23,7 @@
 /* =============================== STRUCTURES =============================== */
 
 typedef struct {
-    uint8_t map[4]; // Mapped to spi_pin_usage_t.
+    pin_t map[4]; // Mapped to spi_pin_usage_t.
 } pins_t;
 
 typedef struct {
@@ -39,9 +39,9 @@ typedef struct {
 
 /* ================================ GLOBALS ================================= */
 
-static registers_t _regs = SPI_REGS_INIT;
-static config_t    _cfg  = { 0, };
-static pins_t      _pins = { 0xFF, };
+static const registers_t _regs = SPI_REGS_INIT;
+static config_t          _cfg  = { 0, };
+static pins_t            _pins = { 0, };
 
 /* =========================== INTERRUPT HANDLERS =========================== */
 
@@ -89,19 +89,17 @@ int spi_init(uint32_t clk, spi_mode_t m, spi_control_t ctl, spi_sbit_t sb)
     return 0;
 }
 
-int spi_init_pin(uint8_t pin, spi_pin_usage_t usage)
+void spi_init_pin(pin_t pin, spi_pin_usage_t usage)
 {
     _pins.map[usage] = pin;
-
-    return 0;
 }
 
 int spi_begin(void)
 {
     /* Check that the pins were set up properly. */
-    if (_pins.map[SPI_PIN_SS] == 0xFF ||
-        _pins.map[SPI_PIN_SCK] == 0xFF ||
-        _pins.map[SPI_PIN_MOSI] == 0xFF) {
+    if (!_pins.map[SPI_PIN_SS].raw ||
+        !_pins.map[SPI_PIN_SCK].raw ||
+        !_pins.map[SPI_PIN_MOSI].raw) {
         return -1;
     }
 
@@ -116,7 +114,7 @@ int spi_begin(void)
                                  [SPI_PIN_SS]   = PIN_MODE_INPUT };
 
     /* If acting as master, set SS to HIGH to enable pull-up resistor. */
-    gpio_digital_write(SPI_PIN_SS, is_mstr);
+    gpio_digital_write(_pins.map[SPI_PIN_SS], is_mstr);
 
     gpio_pin_mode(_pins.map[SPI_PIN_SS], is_mstr ^ PIN_MODE[SPI_PIN_SS]);
 
@@ -132,24 +130,26 @@ int spi_begin(void)
     return 0;
 }
 
-int spi_end(void)
+void spi_end(void)
 {
     *_regs.spcr = 0;
     *_regs.spsr = 0;
-
-    return 0;
 }
 
-int spi_select(uint8_t ss_pin)
+void spi_select(pin_t ss_pin)
 {
+    const pin_t pin = ss_pin;
+
     /* Notify slave of incoming data. */
-    return gpio_digital_write(ss_pin, 0);
+    gpio_digital_write(pin, 0);
 }
 
-int spi_deselect(uint8_t ss_pin)
+void spi_deselect(pin_t ss_pin)
 {
+    const pin_t pin = ss_pin;
+
     /* Release the slave to signal the end of data transfer. */
-    return gpio_digital_write(ss_pin, 1);
+    gpio_digital_write(pin, 1);
 }
 
 int spi_exchange(uint8_t in)

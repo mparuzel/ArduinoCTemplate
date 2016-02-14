@@ -27,20 +27,66 @@
 /* =============================== STRUCTURES =============================== */
 
 typedef enum {
-	PIN_MODE_INPUT = 0,
-	PIN_MODE_OUTPUT = 1,
-	PIN_MODE_INPUT_PULLUP = 2
+	PIN_MODE_OUTPUT         = 0,
+	PIN_MODE_INPUT          = 1,
+	PIN_MODE_INPUT_PULLUP   = 2
 } pin_mode_t;
+
+typedef enum {
+    IRQ_CHANGE  = 1,
+    IRQ_FALLING = 2,
+    IRQ_RISING  = 3
+} interrupt_mode_t;
 
 /* ================================ GPIO API ================================ */
 
-int gpio_pin_mode(uint8_t pin, pin_mode_t mode);
-int gpio_get_pin_mode(uint8_t pin);
+static inline int gpio_pin_mode(pin_t pin, pin_mode_t mode)
+{
+    if (mode == PIN_MODE_OUTPUT) {
+        *pin.regs.ddr |= pin.regs.bit;
+    } else {
+        *pin.regs.ddr &= ~pin.regs.bit;
 
-int gpio_digital_write(uint8_t pin, uint8_t val);
-int gpio_digital_read(uint8_t pin);
+        if (mode == PIN_MODE_INPUT_PULLUP) {
+            *pin.regs.port |= pin.regs.bit;
+        } else {
+            *pin.regs.port &= ~pin.regs.bit;
+        }
+    }
+}
 
-int gpio_analog_write(uint8_t pin, uint16_t val);
-int gpio_analog_read(uint8_t pin);
+static inline pin_mode_t gpio_get_pin_mode(pin_t pin)
+{
+    if (*pin.regs.ddr & pin.regs.bit) {
+        return PIN_MODE_OUTPUT;
+    } else {
+        if (*pin.regs.port & pin.regs.bit) {
+            return PIN_MODE_INPUT_PULLUP;
+        }
+
+        return PIN_MODE_INPUT;
+    }
+}
+
+static inline void gpio_digital_write(pin_t pin, uint8_t val)
+{
+    if (!val)
+    {
+        *pin.regs.port &= ~pin.regs.bit;
+    } else {
+        *pin.regs.port |= pin.regs.bit;
+    }
+}
+
+static inline int gpio_digital_read(pin_t pin)
+{
+    return (*pin.regs.port & pin.regs.bit) ? 1 : 0;
+}
+
+/* TODO analog */
+
+
+int gpio_attach_irq(uint8_t pin, void (*func)(void), interrupt_mode_t mode);
+int gpio_detach_irq(uint8_t pin);
 
 #endif
