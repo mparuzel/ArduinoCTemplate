@@ -1,6 +1,6 @@
 /*
  * Author: Mark Paruzel <mark@markparuzel.com>
- * Date:  2015-12-31
+ * Date:  2016-02-13
  *
  * This file is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,9 +24,14 @@
 #include <stdint.h>
 #include <stddef.h>
 
-/* =============================== STRUCTURES =============================== */
+/* =========================== INTERRUPT FUNCTIONS ========================== */
 
+int interrupt_enable(uint8_t int_num);
+int interrupt_disable(uint8_t int_num);
 
+/* =========================== INTERRUPT HANDLERS =========================== */
+
+void irq_0_handler(void);
 
 
 #endif

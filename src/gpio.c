@@ -58,3 +58,16 @@ int gpio_detach_irq(uint8_t pin)
     detachInterrupt(pin);
     return 0;
 }
+
+
+
+#include "interrupt.h"
+
+extern int aaaa;
+void __attribute__((weak)) isr_timer0(void);
+void __attribute__((weak)) isr_timer0(void)
+{
+    //printf("TIMER1_OVF_vect\n");
+    aaaa++;
+}
+

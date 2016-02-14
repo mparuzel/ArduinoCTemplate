@@ -1,6 +1,6 @@
 /*
  * Author: Mark Paruzel <mark@markparuzel.com>
- * Date:  2015-12-31
+ * Date:  2016-02-13
  *
  * This file is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,3 +17,17 @@
  */
 
 #include "interrupt.h"
+
+
+#include <avr/io.h>
+
+#include <avr/interrupt.h>
+#include <stdio.h>
+int aaaa = 0;
+
+//void isr_timer0(void)
+
+//void isr_timer0(void)  __attribute__ ((weak));
+
+void __attribute__((weak)) isr_timer0(void)  ;
+inline ISR(TIMER1_OVF_vect) { isr_timer0(); }
