@@ -45,7 +45,7 @@ static FILE _serial_fp   = { 0 };
 
 /* =========================== INTERRUPT HANDLERS =========================== */
 
-void RX_VECTOR(void)
+void isr_usart_rx(void)
 {
     /* If errors are detected, reset the interrupt. */
     if (*_regs.ucsra & (_BV(FE) | _BV(DOR) | _BV(UPE))) {
@@ -67,7 +67,7 @@ void RX_VECTOR(void)
     }
 }
 
-void TX_VECTOR(void)
+void isr_usart_udre(void)
 {
     *_regs.udr = _tx.buf[_tx.tail];
     _tx.tail = (_tx.tail + 1) & (SERIAL_BUFFER_SIZE - 1);

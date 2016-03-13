@@ -2,7 +2,7 @@
 extern "C" {
 #include "serial.h"
 #include "spi.h"
-#include "gpio.h"
+#include "digital.h"
 }
 
 extern "C" {
@@ -10,54 +10,36 @@ extern "C" {
 #include <avr/interrupt.h>
 #include <stdio.h>
 #include <avr/wdt.h>
-#include "interrupt.h"
-
-extern int aaaa;
-/*
-void isr_timer0(void)
-{
-    aaaa=10;
-}
-*/
-
-}
-
-//initialize watchdog
-void WDT_Init(void)
-{
-//disable interrupts
-cli();
-TIMSK1 |= (1<<TOIE0);                        // Overflow Interrupt enable
-TCCR1A |= ((1<<CS00) | (1<<CS02));            // Prescaler 128
-TCNT1 = 0;
-   //Enable Global Interrupts
-   sei();
-
+#include "isr.h"
 }
 
 void setup(void)
 {
-    	// Disable all interrupts
-	WDT_Init();
 
-
-	gpio_pin_mode(PIN_13, PIN_MODE_OUTPUT);
+	digital_pin_mode(PIN_B5, PIN_MODE_OUTPUT);
 
     serial_init(9600);
     serial_set_fdev();
+
+    printf("Setup.\n");
 }
-
-
 
 void loop(void)
 {
 
- while(1) {
-          gpio_digital_write(PIN_13, 1);
-     _delay_ms(1000);
-     gpio_digital_write(PIN_13, 0);
-     _delay_ms(1000);
-     printf("%d\n", aaaa);
- }
+    unsigned long ms = micros();
+    unsigned long now = 0;
+    uint8_t g = 1;
 
+    for (uint8_t i = 0; i < 255; ++i) { //116
+        digital_write(PIN_B5, 1);
+        digital_write(PIN_B5, 0);
+    }
+
+      now = micros();
+    printf("Took: %d ms\n", now - ms);
+
+
+
+    while (1) {};
 }

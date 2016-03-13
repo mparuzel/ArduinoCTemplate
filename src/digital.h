@@ -16,8 +16,8 @@
  * along with this file; if not, see: <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GPIO_H
-#define GPIO_H
+#ifndef DIGITAL_H
+#define DIGITAL_H
 
 #include "board.h"
 
@@ -32,15 +32,9 @@ typedef enum {
 	PIN_MODE_INPUT_PULLUP   = 2
 } pin_mode_t;
 
-typedef enum {
-    IRQ_CHANGE  = 1,
-    IRQ_FALLING = 2,
-    IRQ_RISING  = 3
-} interrupt_mode_t;
+/* ============================ DIGITAL PIN API ============================= */
 
-/* ================================ GPIO API ================================ */
-
-static inline int gpio_pin_mode(pin_t pin, pin_mode_t mode)
+static inline void digital_pin_mode(pin_t pin, pin_mode_t mode)
 {
     if (mode == PIN_MODE_OUTPUT) {
         *pin.regs.ddr |= pin.regs.bit;
@@ -55,7 +49,7 @@ static inline int gpio_pin_mode(pin_t pin, pin_mode_t mode)
     }
 }
 
-static inline pin_mode_t gpio_get_pin_mode(pin_t pin)
+static inline pin_mode_t digital_get_pin_mode(const pin_t pin)
 {
     if (*pin.regs.ddr & pin.regs.bit) {
         return PIN_MODE_OUTPUT;
@@ -68,7 +62,7 @@ static inline pin_mode_t gpio_get_pin_mode(pin_t pin)
     }
 }
 
-static inline void gpio_digital_write(pin_t pin, uint8_t val)
+static inline void digital_write(const pin_t pin, uint8_t val)
 {
     if (!val)
     {
@@ -78,15 +72,9 @@ static inline void gpio_digital_write(pin_t pin, uint8_t val)
     }
 }
 
-static inline int gpio_digital_read(pin_t pin)
+static inline int digital_read(pin_t pin)
 {
     return (*pin.regs.port & pin.regs.bit) ? 1 : 0;
 }
-
-/* TODO analog */
-
-
-int gpio_attach_irq(uint8_t pin, void (*func)(void), interrupt_mode_t mode);
-int gpio_detach_irq(uint8_t pin);
 
 #endif

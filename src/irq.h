@@ -1,6 +1,6 @@
 /*
  * Author: Mark Paruzel <mark@markparuzel.com>
- * Date:  2015-12-31
+ * Date:  2016-02-28
  *
  * This file is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,8 +16,8 @@
  * along with this file; if not, see: <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SPI_H
-#define SPI_H
+#ifndef IRQ_H
+#define IRQ_H
 
 #include "board.h"
 
@@ -27,37 +27,31 @@
 /* =============================== STRUCTURES =============================== */
 
 typedef enum {
-    SPI_MODE_0,
-    SPI_MODE_1,
-    SPI_MODE_2,
-    SPI_MODE_3
-} spi_mode_t;
+    IRQ_CHANGE  = 1,
+    IRQ_FALLING = 2,
+    IRQ_RISING  = 3
+} irq_mode_t;
 
-typedef enum {
-    SPI_MASTER,
-    SPI_SLAVE
-} spi_control_t;
+/* ========================= EXTERNAL INTERRUPT API ========================= */
 
-typedef enum {
-    SPI_MSB,
-    SPI_LSB
-} spi_sbit_t;
+/* Enables an external interrupt. Once enabled, the interrupt handler isr_int*()
+ * will fire when a signal is detected on the pin.
+ */
+int irq_external_enable(uint8_t int_num, irq_mode_t mode);
 
-typedef enum {
-    SPI_PIN_MISO,
-    SPI_PIN_MOSI,
-    SPI_PIN_SCK,
-    SPI_PIN_SS
-} spi_pin_usage_t;
+/* Disables external interrupt.
+ */
+int irq_external_disable(uint8_t int_num);
 
-/* ==================== SERIAL PERIPHERAL INTERFACE API ===================== */
+/* ======================== PIN CHANGE INTERRUPT API ======================== */
 
-int  spi_init(uint32_t clock, spi_mode_t mode, spi_control_t ctl, spi_sbit_t sb);
-void spi_init_pin(pin_t pin, spi_pin_usage_t usage);
-int  spi_begin(void);
-void spi_end(void);
-void spi_select(pin_t ss_pin);
-void spi_deselect(pin_t ss_pin);
-int  spi_exchange(uint8_t in);
+/* Enables an pin change interrupt. A pin change ISR handles a change on pins
+ * marked as PCINT##.
+ */
+int irq_pin_change_enable(uint8_t pcint_num);
+
+/* Disables the a pin change trigger.
+ */
+int irq_pin_change_disable(uint8_t pcint_num);
 
 #endif

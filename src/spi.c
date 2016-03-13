@@ -18,7 +18,7 @@
 
 #include "spi.h"
 #include "spi_internal.h"
-#include "gpio.h"
+#include "digital.h"
 
 /* =============================== STRUCTURES =============================== */
 

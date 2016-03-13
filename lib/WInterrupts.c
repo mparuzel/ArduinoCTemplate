@@ -337,11 +337,11 @@ ISR(INT7_vect) {
 
 #else
 
-ISR(INT0_vect) {
+void isr_int0(void) {
     intFunc[EXTERNAL_INT_0]();
 }
 
-ISR(INT1_vect) {
+void isr_int1(void) {
     intFunc[EXTERNAL_INT_1]();
 }
 

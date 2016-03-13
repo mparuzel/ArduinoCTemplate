@@ -1,6 +1,6 @@
 /*
  * Author: Mark Paruzel <mark@markparuzel.com>
- * Date:  2015-12-15
+ * Date:  2016-02-28
  *
  * This file is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,25 +16,34 @@
  * along with this file; if not, see: <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GPIO_INTERNAL_H
-#define GPIO_INTERNAL_H
+#ifndef ANALOG_H
+#define ANALOG_H
 
-#include <avr/io.h>
-#include <avr/interrupt.h>
+#include "board.h"
 
-/* Support up to 8 Interrupts.
-#if defined(INT0_vect)
-#   define INT0_VECTOR(x) INT0_vector
-#endif
+#include <stdint.h>
+#include <stddef.h>
 
-ISR(INT0_VECTOR);
+/* =============================== ANALOG API =============================== */
 
 
+int analog_init(void);
+int analog_stop_pwm(uint8_t timer);
 
-#elif defined(USART_RX_vect)
-#   define INT0_HANDLER USART0_RX_vect
-#elif defined(USART_RXC_vect)
-#   define INT0_HANDLER USART0_RX_vect
-#endif*/
+
+static inline int analog_read(pin_t pin)
+{
+    // http://www.arduinoos.com/2011/09/pwm-part-2/
+    // https://github.com/H2CO3/libavrutil/blob/master/src/analog.h
+    return 0;
+}
+
+static inline void analog_write(pin_t pin, int val)
+{
+
+
+    return 0;
+}
+
 
 #endif
