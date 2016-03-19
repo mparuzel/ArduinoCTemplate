@@ -42,8 +42,9 @@ typedef union {
 
 /* =============================== PIN LAYOUT =============================== */
 
-#if defined(__AVR_ATmega168__) ||  \
+#if defined(__AVR_ATmega168__)  || \
     defined(__AVR_ATmega168P__) || \
+    defined(__AVR_ATmega328__)  || \
     defined(__AVR_ATmega328P__)
 
 /* ATmega168/168P/328P Pin Setup:
@@ -97,8 +98,84 @@ static const pin_t PIN_D5 = MAKE_PIN(D, 5); /* D5,   PCINT21, OC0B,  T1       */
 static const pin_t PIN_D6 = MAKE_PIN(D, 6); /* D6,   PCINT22, OC0A,  AIN0     */
 static const pin_t PIN_D7 = MAKE_PIN(D, 7); /* D7,   PCINT32,        AIN1     */
 
+/* Special Pins. */
+static const pin_t PIN_NA = MAKE_PIN(C, 7); /* This pin does not exist.       */
+
 #else
 #   error "Unsupported board; Please add pin constants."
 #endif
+
+/* =============================== PIN ALIASES ============================== */
+
+/* Digital Pins. */
+#define PIN_DIGITAL_0       PIN_D0
+#define PIN_DIGITAL_1       PIN_D1
+#define PIN_DIGITAL_2       PIN_D2
+#define PIN_DIGITAL_3       PIN_D3
+#define PIN_DIGITAL_4       PIN_D4
+#define PIN_DIGITAL_5       PIN_D5
+#define PIN_DIGITAL_6       PIN_D6
+#define PIN_DIGITAL_7       PIN_D7
+#define PIN_DIGITAL_8       PIN_B0
+#define PIN_DIGITAL_9       PIN_B1
+#define PIN_DIGITAL_10      PIN_B2
+#define PIN_DIGITAL_11      PIN_B3
+#define PIN_DIGITAL_12      PIN_B4
+#define PIN_DIGITAL_13      PIN_B5
+
+/* Analog Pins. */
+#define PIN_ANALOG_0        PIN_C0
+#define PIN_ANALOG_1        PIN_C1
+#define PIN_ANALOG_2        PIN_C2
+#define PIN_ANALOG_3        PIN_C3
+#define PIN_ANALOG_4        PIN_C4
+#define PIN_ANALOG_5        PIN_C5
+
+/* Analog Input Pins. */
+#define PIN_AIN0            PIN_D6
+#define PIN_AIN1            PIN_D7
+
+/* External Interrupt Pins. */
+#define PIN_INT0            PIN_D2
+#define PIN_INT1            PIN_D3
+
+/* Timer Pins. */
+#define PIN_T0              PIN_D4
+#define PIN_T1              PIN_D5
+
+/* Timer Pins (Output Compare). */
+#define PIN_OC0A            PIN_D6
+#define PIN_OC0B            PIN_D5
+#define PIN_OC1A            PIN_B1
+#define PIN_OC1B            PIN_B2
+#define PIN_OC2A            PIN_B3
+#define PIN_OC2B            PIN_D3
+
+/* Timer Pins (Input Capture). */
+#define PIN_ICP1            PIN_B0
+
+/* I2C Pins. */
+#define PIN_SDA             PIN_C4
+#define PIN_SDL             PIN_C5
+
+/* SPI Pins. */
+#define PIN_MOSI            PIN_B3
+#define PIN_MISO            PIN_B4
+#define PIN_SCK             PIN_B5
+#define PIN_SS              PIN_B2
+
+/* External Clock Frequency. */
+#define PIN_XTAL1           PIN_B6
+#define PIN_XTAL2           PIN_B7
+
+/* External Clock Input. */
+#define PIN_TOSC1           PIN_B6
+#define PIN_TOSC2           PIN_B7
+
+/* External CLock Output. */
+#define PIN_XCK             PIN_D4
+
+/* Clock Output. */
+#define PIN_CLK0            PIN_B0
 
 #endif

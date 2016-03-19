@@ -43,21 +43,25 @@ typedef enum {
     SPI_LSB
 } spi_sbit_t;
 
-typedef enum {
-    SPI_PIN_MISO,
-    SPI_PIN_MOSI,
-    SPI_PIN_SCK,
-    SPI_PIN_SS
-} spi_pin_usage_t;
-
 /* ==================== SERIAL PERIPHERAL INTERFACE API ===================== */
 
-int  spi_init(uint32_t clock, spi_mode_t mode, spi_control_t ctl, spi_sbit_t sb);
-void spi_init_pin(pin_t pin, spi_pin_usage_t usage);
-int  spi_begin(void);
+#include "digital.h"
+
+int spi_init(uint32_t clock, spi_mode_t mode, spi_control_t ctl, spi_sbit_t sb);
+int spi_begin(pin_t ss_pin);
 void spi_end(void);
-void spi_select(pin_t ss_pin);
-void spi_deselect(pin_t ss_pin);
-int  spi_exchange(uint8_t in);
+
+static inline void spi_select(pin_t ss_pin)
+{
+    /* Notify slave of incoming data. */
+    digital_write(ss_pin, 0);
+}
+
+static inline void spi_deselect(pin_t ss_pin)
+{
+    /* Release the slave to signal the end of data transfer. */
+    digital_write(ss_pin, 1);
+}
+int spi_exchange(uint8_t in);
 
 #endif
