@@ -15,10 +15,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this file; if not, see: <http://www.gnu.org/licenses/>.
  */
-#include "board.h"
-#include "digital.h"
+
 #include "spi.h"
 #include "spi_internal.h"
+#include "digital.h"
 
 /* =============================== STRUCTURES =============================== */
 

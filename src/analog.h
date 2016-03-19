@@ -21,9 +21,6 @@
 
 #include "board.h"
 
-#include <stdint.h>
-#include <stddef.h>
-
 /* =============================== ANALOG API =============================== */
 
 
