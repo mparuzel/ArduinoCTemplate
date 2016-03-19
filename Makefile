@@ -9,9 +9,9 @@ AVRETC_DIR = C:\PROGRA~2\Arduino\hardware\tools\avr\etc
 # The serial port number (Linux: /dev/ttyACM0, Windows: COMx).
 SERIAL_PORT = COM3
 
-## ------------------------------------------------------------------------- ##
-##                               PROJECT SETUP                               ##
-## ------------------------------------------------------------------------- ##
+## -------------------------------------------------------------------------- ##
+##                                PROJECT SETUP                               ##
+## -------------------------------------------------------------------------- ##
 
 # Name of your project.
 TARGET = test
@@ -21,9 +21,9 @@ SRC_DIR = src
 LIB_DIR = lib
 BUILD_DIR = build
 
-## ------------------------------------------------------------------------- ##
-##                             PROGRAMMER SETUP                              ##
-## ------------------------------------------------------------------------- ##
+## -------------------------------------------------------------------------- ##
+##                              PROGRAMMER SETUP                              ##
+## -------------------------------------------------------------------------- ##
 
 # Baud rate.
 UPLOAD_SPEED = 57600
@@ -37,9 +37,9 @@ CPU_FREQ = 16000000L
 # Board type.
 MCU = atmega328p
 
-## ------------------------------------------------------------------------- ##
-##                     BEYOND HERE LIES MAKEFILE SORCERY                     ##
-## ------------------------------------------------------------------------- ##
+## -------------------------------------------------------------------------- ##
+##                      BEYOND HERE LIES MAKEFILE SORCERY                     ##
+## -------------------------------------------------------------------------- ##
 
 # AVR Toolchain.
 CC		=$(AVRBIN_DIR)/avr-gcc
@@ -65,7 +65,7 @@ CPP_OBJS	= $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(CPP_FILES))
 
 # Compiler flags.
 LDFLAGS		= -Wl,--gc-sections -Wl,-s -Wl,-static
-OPT_FLAGS	= -O2 -g
+OPT_FLAGS	= -O2
 CFLAGS		= $(OPT_FLAGS) -ffunction-sections -fdata-sections -mmcu=$(MCU) -DF_CPU=$(CPU_FREQ) -MMD -DUSB_VID=null -DUSB_PID=null -DARDUINO=10606 -I$(SRC_DIR) -I$(LIB_DIR)
 CPPFLAGS	= -fno-exceptions $(CFLAGS)
 
@@ -102,4 +102,4 @@ upload: $(BUILD_DIR)/$(TARGET)
 
 .PHONY: clean
 clean:
-	rm build/*
+	rm -rf build/*
