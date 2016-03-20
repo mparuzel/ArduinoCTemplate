@@ -34,7 +34,7 @@ int irq_external_enable(uint8_t int_num, irq_mode_t mode)
                             [1] = { .bit = _BV(INT1), .shift = ISC10 } };
 
     /* Check inputs. */
-    if (int_num > sizeof(REGS) / sizeof(REGS[0])) {
+    if (int_num >= sizeof(REGS) / sizeof(REGS[0])) {
         return -1;
     }
 
@@ -51,9 +51,8 @@ int irq_external_enable(uint8_t int_num, irq_mode_t mode)
 
 int irq_external_disable(uint8_t int_num)
 {
-#if 0
-    const regs_t REGS[] = { [0] = _BV(INT0),
-                            [1] = _BV(INT1) };
+    const uint8_t REGS[] = { [0] = _BV(INT0),
+                             [1] = _BV(INT1) };
 
     /* Check inputs. */
     if (int_num > sizeof(REGS) / sizeof(REGS[0])) {
@@ -62,7 +61,7 @@ int irq_external_disable(uint8_t int_num)
 
     /* Disable interrupt. */
     EIMSK &= ~_BV(int_num);
-#endif
+
     return 0;
 }
 

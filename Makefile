@@ -65,7 +65,7 @@ CPP_OBJS	= $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(CPP_FILES))
 
 # Compiler flags.
 LDFLAGS		= -Wl,--gc-sections -Wl,-s -Wl,-static
-OPT_FLAGS	= -O2 -std=c99
+OPT_FLAGS	= -O3 -std=c99
 CFLAGS		= $(OPT_FLAGS) -ffunction-sections -fdata-sections -mmcu=$(MCU) -DF_CPU=$(CPU_FREQ) -MMD -DUSB_VID=null -DUSB_PID=null -DARDUINO=10606 -I$(SRC_DIR) -I$(LIB_DIR)
 CPPFLAGS	= -fno-exceptions $(CFLAGS)
 
