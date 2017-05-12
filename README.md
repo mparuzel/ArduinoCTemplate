@@ -1,7 +1,8 @@
-Arduino in Pure C Template Project
-==================================
+===============================================================================
+==                          ARDUINO SKELETON PROJECT                         ==
+===============================================================================
 
-Skeleton for an Arduino project (Based on deweerdt's skeleton project). 
+Skeleton for an Arduino project (Based on deweerdt's skeleton project).
 
 * https://github.com/deweerdt/arduino-uno-project
 
@@ -13,21 +14,33 @@ This project contains sources from the Arduino IDE v1.6.
 How to
 ======
 
-1. Checkout this repository:
-	git clone https://github.com/mparuzel/ArduinoCTemplate.git
+1. Fetch the official Arduino IDE from arduino.cc:
+	<http://arduino.cc/en/main/software>
+	Untar the file to somewhere suitable (e.g. /home/user/arduino_ide)
+2. Install the following packages
+
+	`avr-libc avrdude binutils-avr gcc-avr`
+
+	This won't be needed if you want to re-use the binaries shipped
+	with the IDE, in that case you may have to set your PATH
+	environment variable accordingly.
+3. Checkout this repository:
+	git clone git://github.com/deweerdt/arduino-uno-project.git
 4. Edit the `Makefile` file to suit your environment
 	There are two variables that you will need to edit:
-	* `AVRBIN_DIR` and `AVRETC_DIR`: the installtion path of your AVR toolkit or 
-	Arduino install (ie. C:\Program Files (x86)\Arduino\hardware\tools\avr).
-	* `SERIAL_PORT`: The port where your Arduino is tethered to. On Windows this
-	is most likely `COM3`, on Linux it can reside in `/dev/tty*`.
-5. Add your files into the `./src` directory.
-6. `make` and then `make upload`
+	* `ARDUINO_HOME`: the path where you untarred the IDE in step
+	1) (e.g. /home/user/arduino_ide)
+	* `SERIAL`: the path where your arduino listens on. If you
+	don't know which one, try plugging and unplugging the board,
+	and check how the files in `/dev/` differ
+5. Edit the main.c file to suit your needs
+6. `make` and then `make push`
 
 Notes
 =====
 
-* This has only been tested with the Arduino Nano board.
+* This has only been tested with the Arduino Uno board, and won't probably
+work as-is with other boards.
 * The Makefile supports three commands:
 	* `all`: build and link the main binary
 	* `upload`: upload the binary to the board
