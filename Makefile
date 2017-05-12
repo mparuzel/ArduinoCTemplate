@@ -3,15 +3,19 @@
 ## ------------------------------------------------------------------------- ##
 
 # Location of the AVR toolchain (Be mindful of spaces).
-AVRBIN_DIR = C:\PROGRA~2\Arduino\hardware\tools\avr\bin
-AVRETC_DIR = C:\PROGRA~2\Arduino\hardware\tools\avr\etc
+# AVR_DIR = C:\PROGRA~2\Arduino\hardware\tools\avr
+AVR_DIR = C:\PROGRA~1\AVR
+
+# Relevant subdirectories
+AVRBIN_DIR = $(AVR_DIR)/bin
+AVRETC_DIR = $(AVR_DIR)/etc
 
 # The serial port number (Linux: /dev/ttyACM0, Windows: COMx).
 SERIAL_PORT = COM3
 
-## ------------------------------------------------------------------------- ##
-##                               PROJECT SETUP                               ##
-## ------------------------------------------------------------------------- ##
+## -------------------------------------------------------------------------- ##
+##                                PROJECT SETUP                               ##
+## -------------------------------------------------------------------------- ##
 
 # Name of your project.
 TARGET = test
@@ -21,9 +25,9 @@ SRC_DIR = src
 LIB_DIR = lib
 BUILD_DIR = build
 
-## ------------------------------------------------------------------------- ##
-##                             PROGRAMMER SETUP                              ##
-## ------------------------------------------------------------------------- ##
+## -------------------------------------------------------------------------- ##
+##                              PROGRAMMER SETUP                              ##
+## -------------------------------------------------------------------------- ##
 
 # Baud rate.
 UPLOAD_SPEED = 57600
@@ -37,9 +41,9 @@ CPU_FREQ = 16000000L
 # Board type.
 MCU = atmega328p
 
-## ------------------------------------------------------------------------- ##
-##                     BEYOND HERE LIES MAKEFILE SORCERY                     ##
-## ------------------------------------------------------------------------- ##
+## -------------------------------------------------------------------------- ##
+##                      BEYOND HERE LIES MAKEFILE SORCERY                     ##
+## -------------------------------------------------------------------------- ##
 
 # AVR Toolchain.
 CC		=$(AVRBIN_DIR)/avr-gcc
@@ -65,7 +69,7 @@ CPP_OBJS	= $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(CPP_FILES))
 
 # Compiler flags.
 LDFLAGS		= -Wl,--gc-sections -Wl,-s -Wl,-static
-OPT_FLAGS	= -Os -g
+OPT_FLAGS	= -O3 -std=c99
 CFLAGS		= $(OPT_FLAGS) -ffunction-sections -fdata-sections -mmcu=$(MCU) -DF_CPU=$(CPU_FREQ) -MMD -DUSB_VID=null -DUSB_PID=null -DARDUINO=10606 -I$(SRC_DIR) -I$(LIB_DIR)
 CPPFLAGS	= -fno-exceptions $(CFLAGS)
 
@@ -93,13 +97,13 @@ $(BUILD_DIR)/$(TARGET): $(BUILD_DIR)/$(TARGET).elf
 	$(SIZE) $@
 
 .PHONY: build
-build: 
+build:
 	mkdir -p build
-	
+
 .PHONY: upload
 upload: $(BUILD_DIR)/$(TARGET)
 	$(AVRDUDE) -C$(AVRETC_DIR)/avrdude.conf -v -v -p$(MCU) -c$(UPLOAD_PROTOCOL) -P$(SERIAL_PORT) -b$(UPLOAD_SPEED) -D -Uflash:w:$(BUILD_DIR)/$(TARGET):i
 
 .PHONY: clean
 clean:
-	rm build/*
+	rm -rf build/*
