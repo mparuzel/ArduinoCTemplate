@@ -1,6 +1,5 @@
-===============================================================================
-==                          ARDUINO SKELETON PROJECT                         ==
-===============================================================================
+ARDUINO SKELETON PROJECT
+========================
 
 Skeleton for an Arduino project (Based on deweerdt's skeleton project).
 
