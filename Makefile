@@ -3,8 +3,12 @@
 ## ------------------------------------------------------------------------- ##
 
 # Location of the AVR toolchain (Be mindful of spaces).
-AVRBIN_DIR = C:\PROGRA~2\Arduino\hardware\tools\avr\bin
-AVRETC_DIR = C:\PROGRA~2\Arduino\hardware\tools\avr\etc
+# AVR_DIR = C:\PROGRA~2\Arduino\hardware\tools\avr
+AVR_DIR = C:\PROGRA~1\AVR
+
+# Relevant subdirectories
+AVRBIN_DIR = $(AVR_DIR)/bin
+AVRETC_DIR = $(AVR_DIR)/etc
 
 # The serial port number (Linux: /dev/ttyACM0, Windows: COMx).
 SERIAL_PORT = COM3
